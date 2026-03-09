@@ -6,7 +6,7 @@ This node provides a service to capture laser scans at waypoints.
 It subscribes to /scan and /localization/pose, and when triggered,
 saves the current scan as a PointCloud2 along with the pose estimate.
 
-Author: [Student Team]
+Author: Team 4 - Malcolm Benedict + Ian Mattson
 Course: EE5531 Introduction to Robotics
 Project: 6 - Waypoint Mapping
 """
@@ -15,15 +15,18 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
+from std_msgs.msg import Header
 from sensor_msgs.msg import LaserScan, PointCloud2, PointField
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry
 
 from scan_capture_pkg.srv import CaptureScan
 
+import sensor_msgs_py.point_cloud2 as pc2
 import numpy as np
 import os
 import yaml
+import math
 
 
 class ScanCaptureNode(Node):
@@ -53,6 +56,7 @@ class ScanCaptureNode(Node):
         # TODO: Initialize variables to hold the latest scan and pose messages,
         #       and a counter for the number of captures taken
         # =====================================================================
+        self.outliers = 0
 
         # =====================================================================
         # Subscribers
@@ -91,15 +95,39 @@ class ScanCaptureNode(Node):
 
     def laserscan_to_pointcloud2(self, scan: LaserScan) -> PointCloud2:
         """
-        Convert a LaserScan message to PointCloud2.
-
-        TODO: Implement the conversion:
-        1. Compute Cartesian (x, y) coordinates from range and angle data
-        2. Filter out invalid ranges (outside [range_min, range_max] or non-finite)
-        3. Build and return a PointCloud2 message with XYZ float32 fields
-           in the same frame as the input scan
+        Convert input LaserScan() msg to PointCloud2() msg
+        Filter out invalid ranges, convert to XYZ, populate PointCloud2 msg
         """
-        raise NotImplementedError('laserscan_to_pointcloud2 not yet implemented')
+
+        range_data = scan.ranges # meters
+        points = [] # list of [x,y,z] points
+
+        for i, range in enumerate(range_data):
+
+            # reject data outside of valid ranges
+            if range > scan.range_max or range < scan.range_min:
+                self.outliers = self.outliers + 1
+                break
+
+            # calculate x,y coordinates of all valid data
+            angle = scan.angle_min + i * scan.angle_increment # Radians
+            x = range * math.cos(angle)
+            y = range * math.sin(angle)
+            points.append([x,y,0]) # 2D measurement, no z data (set to zero)
+
+        header = Header()
+        header.stamp = self.get_clock().now()
+        header.frame_id = scan.header.frame_id
+
+        fields = [
+            PointField('x', 0, PointField.FLOAT32, 1),
+            PointField('y', 4, PointField.FLOAT32, 1),
+            PointField('z', 8, PointField.FLOAT32, 1),
+        ]
+
+        return pc2.create_cloud(header, fields, points)
+
+
 
     def save_capture(self, waypoint_id: int, description: str,
                      scan: LaserScan, pose: PoseStamped) -> str:
@@ -113,6 +141,8 @@ class ScanCaptureNode(Node):
         4. Return the path to the saved YAML file
         """
         raise NotImplementedError('save_capture not yet implemented')
+
+
 
     def capture_callback(self, request, response):
         """
