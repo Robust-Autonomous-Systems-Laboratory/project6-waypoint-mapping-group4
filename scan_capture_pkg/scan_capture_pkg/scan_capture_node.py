@@ -20,8 +20,6 @@ from sensor_msgs.msg import LaserScan, PointCloud2, PointField
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry
 from datetime import datetime
-from ament_index_python.packages import get_package_share_directory
-from pathlib import Path
 
 from scan_capture_pkg.srv import CaptureScan
 
@@ -48,63 +46,66 @@ class ScanCaptureNode(Node):
 
         # =====================================================================
         # Parameters
-        # TODO: Declare and read parameters:
-        #   - 'output_dir': directory to save captures (default: 'data/captures')
-        #   - 'pose_topic': topic for pose estimates (default: '/localization/pose')
-        #   - 'scan_topic': topic for laser scans (default: '/scan')
-        # =====================================================================
-        self.output_dir = ''
-        self.pose_topic = ''
-        self.scan_topic = ''
+        self.declare_parameter('output_dir', 'data/captures')
+        self.declare_parameter('pose_topic', '/localization/pose') # double check the default topic!!!
+        self.declare_parameter('scan_topic', '/scan')
+
+        self.output_dir = self.get_parameter('output_dir').get_parameter_value().string_value
+        self.pose_topic = self.get_parameter('pose_topic').get_parameter_value().string_value
+        self.scan_topic = self.get_parameter('scan_topic').get_parameter_value().string_value
 
         # =====================================================================
         # State variables
-        # TODO: Initialize variables to hold the latest scan and pose messages,
-        #       and a counter for the number of captures taken
-        # =====================================================================
-        self.outliers = 0
+        self.pose = PoseStamped
+        self.scan = LaserScan
+        self.odom_pose = PoseStamped # backup if no pose
+        self.counter = 0 # number of captures taken
 
         # =====================================================================
         # Subscribers
-        # TODO: Subscribe to the scan topic (use BEST_EFFORT QoS) and pose topic.
-        #       Also subscribe to /odom as a fallback pose source.
-        # =====================================================================
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT, # Key setting for best effort
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
+
+        self.scan_subcription = self.create_subscription(LaserScan, self.scan_topic, self.scan_callback, qos_profile)
+        self.pose_subscription = self.create_subscription(PoseStamped, self.pose_topic, self.pose_callback)
+        self.odom_subscription = self.create_subscription(Odometry, '/odom', self.odom_callback)
 
         # =====================================================================
         # Publishers
-        # TODO: Publish captured scans as PointCloud2 on /scan_capture/pointcloud
-        # =====================================================================
+        self.pc2_publisher_ = self.create_publisher(PointCloud2, '/scan_capture/pointcloud', 10)
 
         # =====================================================================
         # Service
-        # TODO: Create a service server for /scan_capture/capture using the
-        #       CaptureScan service type
-        # =====================================================================
+        self.srv = self.create_service(CaptureScan, 'capture_scan', self.capture_callback)
 
-        self.get_logger().info('Scan Capture Node started (stub - not yet implemented)')
+
+        self.get_logger().info('Scan Capture Node started')
+
+
+    # =====================================================================
+    # Callbacks and Functions
 
     def scan_callback(self, msg: LaserScan):
         """Store the latest laser scan."""
-        # TODO: Save the incoming scan message to a member variable
-        pass
+        self.scan = msg
 
     def pose_callback(self, msg: PoseStamped):
         """Store the latest pose estimate."""
-        # TODO: Save the incoming pose message to a member variable
-        pass
+        self.pose = msg
 
     def odom_callback(self, msg: Odometry):
         """Fallback: use odometry pose if no localization pose is available."""
-        # TODO: If no pose has been received yet, convert the Odometry message
-        #       to a PoseStamped and store it
-        pass
+        self.odom_pose.header = msg.header
+        self.odom_pose.pose = msg.pose.pose
 
     def laserscan_to_pointcloud2(self, scan: LaserScan) -> PointCloud2:
         """
         Convert input LaserScan() msg to PointCloud2() msg
         Filter out invalid ranges, convert to XYZ, populate PointCloud2 msg
         """
-
         range_data = scan.ranges # meters
         points = [] # list of [x,y,z] points
 
@@ -112,7 +113,6 @@ class ScanCaptureNode(Node):
 
             # reject data outside of valid ranges
             if range > scan.range_max or range < scan.range_min:
-                self.outliers = self.outliers + 1
                 break
 
             # calculate x,y coordinates of all valid data
@@ -135,8 +135,7 @@ class ScanCaptureNode(Node):
 
 
 
-    def save_capture(self, waypoint_id: int, description: str,
-                     scan: LaserScan, pose: PoseStamped) -> str:
+    def save_capture(self, waypoint_id: int, description: str, scan: LaserScan, pose: PoseStamped) -> str:
         
         #1. Generate a timestamped filename using waypoint_id        
         filename = f"waypoint{waypoint_id}_{datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}"
@@ -181,18 +180,43 @@ class ScanCaptureNode(Node):
     def capture_callback(self, request, response):
         """
         Service callback: capture the current scan and pose.
-
-        TODO: Implement the service handler:
-        1. Check that latest scan and pose data are available; return a
-           failure response with an informative message if either is missing
-        2. Convert the scan to PointCloud2 and publish it
-        3. Save the scan and pose using save_capture()
-        4. Populate and return the response (success, message, filename, pose)
         """
-        response.success = False
-        response.message = 'Not yet implemented'
-        response.filename = ''
-        return response
+
+        if self.scan.header.frame_id and self.pose.header.frame_id:
+            # convert scan to pc2 and publish pc2
+            pc2_msg = self.laserscan_to_pointcloud2(self.scan)
+            self.pc2_publisher_.publish(pc2_msg)
+
+            # populate the response msg fields and save the data
+            response.pose = self.pose
+            response.filename = self.save_capture(request.waypoint_id, request.description, self.scan, self.pose)
+            response.success = True
+            response.message = 'Successful using pose'
+            return response
+        
+        elif self.scan.header.frame_id and self.odom_pose.header.frame_id:
+            pc2_msg = self.laserscan_to_pointcloud2(self.scan)
+            self.pc2_publisher_.publish(pc2_msg)
+
+            response.pose = self.odom_pose
+            response.filename = self.save_capture(request.waypoint_id, request.description, self.scan, self.odom_pose)
+            response.success = True
+            response.message = 'Successful using odom as backup, no pose data'
+            return response
+        
+        elif not self.scan.header.frame_id:
+            response.pose = ''
+            response.success = False
+            response.message = 'Failed, no scan data'
+            response.filename = ''
+            return response
+        
+        else:
+            response.pose = ''
+            response.success = False
+            response.message = "Failed, no pose data"
+            response.filename = ''
+            return response
 
 
 def main(args=None):
