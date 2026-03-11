@@ -19,6 +19,9 @@ from std_msgs.msg import Header
 from sensor_msgs.msg import LaserScan, PointCloud2, PointField
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry
+from datetime import datetime
+from ament_index_python.packages import get_package_share_directory
+from pathlib import Path
 
 from scan_capture_pkg.srv import CaptureScan
 
@@ -50,6 +53,9 @@ class ScanCaptureNode(Node):
         #   - 'pose_topic': topic for pose estimates (default: '/localization/pose')
         #   - 'scan_topic': topic for laser scans (default: '/scan')
         # =====================================================================
+        self.output_dir = ''
+        self.pose_topic = ''
+        self.scan_topic = ''
 
         # =====================================================================
         # State variables
@@ -131,16 +137,44 @@ class ScanCaptureNode(Node):
 
     def save_capture(self, waypoint_id: int, description: str,
                      scan: LaserScan, pose: PoseStamped) -> str:
-        """
-        Save captured scan and pose to files.
+        
+        #1. Generate a timestamped filename using waypoint_id        
+        filename = f"waypoint{waypoint_id}_{datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}"
+        yaml_path = os.path.join(self.output_dir, filename + ".yaml")
+        npy_path = os.path.join(self.output_dir, filename + ".npy")
 
-        TODO: Implement file saving:
-        1. Generate a timestamped filename using waypoint_id
-        2. Save pose data (x, y, yaw) and scan metadata to a YAML file
-        3. Save raw range data to a .npy file alongside the YAML
-        4. Return the path to the saved YAML file
-        """
-        raise NotImplementedError('save_capture not yet implemented')
+        # 2. Save pose data (x, y, yaw) and scan metadata to a YAML file
+        yaw = math.atan2(2*(pose.pose.orientation.w * pose.pose.orientation.z + pose.pose.orientation.x * pose.pose.orientation.y), 1-2*(pose.pose.orientation.y**2 + pose.pose.orientation.z**2))
+
+        yaml_data = {
+            'waypoint_id': waypoint_id,
+            'timestamp': datetime.now().strftime('%Y_%m_%d-%H_%M_%S'),
+            'pose': {
+                'x': pose.pose.position.x,
+                'y': pose.pose.position.y,
+                'yaw': yaw
+            },
+            'description': description,
+            'scan_metadata': {
+                'frame': scan.header.frame_id,
+                'angle_min': scan.angle_min,
+                'angle_max': scan.angle_max,
+                'angle_increment': scan.angle_increment,
+                'time_increment': scan.time_increment,
+                'scan_time': scan.scan_time,
+                'range_min': scan.range_min,
+                'range_max': scan.range_max
+            }
+        }
+
+        with open(yaml_path, 'w') as f:
+            yaml.dump(yaml_data, f, sort_keys=False)
+
+        # 3. format range data as npy and write to output
+        np.save(npy_path, np.asarray(scan.ranges))
+
+        # 4.return the path to the saved yaml file
+        return yaml_path
 
 
 
