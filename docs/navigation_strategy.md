@@ -86,29 +86,29 @@ Options:
 7. [ ] Note any observations
 
 ### Measurement Technique
-- Measuring from: [LiDAR center / robot center / tape mark]
-- Measuring to: [Wall surface / corner point / pillar edge]
-- Tool: [Tape measure / laser measure]
-- Estimated measurement uncertainty: ± ___ m
+- Measuring from: Tape mark
+- Measuring to: Wall surface
+- Tool: Laser measure
+- Estimated measurement uncertainty: ± 10 mm
 
 ---
 
 ## 5. Expected Challenges
 
 ### Localization Error Sources
-1. **Odometry drift**: [Expected impact, mitigation]
-2. **IMU bias**: [Expected impact, mitigation]
-3. **Wheel slip**: [Floor conditions]
+1. **Odometry drift**: Significant impact expected. Unfortunately very little can be done about this besides minimizing the number of turns.
+2. **IMU bias**: Moderate impact expected. While IMU data is typically not great, it is not the only data being used and the EKF should help mitigate the impact.
+3. **Wheel slip**: Minimal. The floor appears relatively clean. Picking up obvious debris and minimizing turns should further mitigate this.
 
 ### Mapping Challenges
-1. **Scan alignment**: [How might scans misalign?]
-2. **Landmark visibility**: [Any occlusion concerns?]
-3. **Environmental factors**: [People, lighting, reflections]
+1. **Scan alignment**: This is a significant issue. Due to human error it is very likely the scans will not align perfectly.
+2. **Landmark visibility**: Should be pretty good, the robot is always relatively close to the landmarks.
+3. **Environmental factors**: The biggest issues here will be people and inconsistent readings from table legs.
 
 ### Mitigation Strategies
-- 
-- 
-- 
+- Minimize unnecessary turning.
+- Take extra care when recording measurements and piloting the robot.
+- Use the EKF to filter IMU data.
 
 ---
 
