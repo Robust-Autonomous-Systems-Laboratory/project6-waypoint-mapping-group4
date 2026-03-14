@@ -132,7 +132,7 @@ class ScanCaptureNode(Node):
             points.append([x,y,0]) # 2D measurement, no z data (set to zero)
 
         header = Header()
-        header.stamp = self.get_clock().now()
+        header.stamp = self.get_clock().now().to_msg()
         header.frame_id = scan.header.frame_id
 
         fields = [
@@ -176,7 +176,7 @@ class ScanCaptureNode(Node):
             }
         }
 
-        with open(yaml_path, 'w') as f:
+        with open(yaml_path, 'w+') as f:
             yaml.dump(yaml_data, f, sort_keys=False)
 
         # 3. format range data as npy and write to output
