@@ -17,7 +17,7 @@ description: 'test'"
 ## Terminal 3:
 ```
 $ source ~/ee5531/scripts/turtlebot_connect.sh
-$ ros2 run kalman_filters kf_node 
+$ ros2 run scan_capture_pkg kf_node.py 
 ```
 
 ## Terminal 4:

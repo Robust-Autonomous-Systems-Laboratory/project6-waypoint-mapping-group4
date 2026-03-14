@@ -20,7 +20,10 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scan_capture_pkg/scan_capture_node.py
   scan_capture_pkg/keyboard_capture.py
+  scan_capture_pkg/unscented_kalman.py
   scan_capture_pkg/extended_kalman.py
+  scan_capture_pkg/kalman.py
+  scan_capture_pkg/kf_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

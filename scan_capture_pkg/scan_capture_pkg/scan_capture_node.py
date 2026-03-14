@@ -21,6 +21,7 @@ from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry
 from datetime import datetime
 
+
 from capture_service.srv import CaptureScan
 
 import sensor_msgs_py.point_cloud2 as pc2
@@ -98,16 +99,17 @@ class ScanCaptureNode(Node):
     # actually an odom msg to capture the odom from the existing kf_node from project 4
     def ekf_pose_callback(self, msg: Odometry):
         """Store the latest pose estimate from the localization node."""
-        # self.pose.header = msg.header
-        # self.pose.header.frame_id = "map"
-        # self.pose.header.stamp = node.get_clock().now().to_msg() # FINISH AND REVISE!
-        # self.pose.position.x = 1.0
-        # self.pose.pose.position = msg.pose.pose.position
+        self.pose.header.frame_id = msg.header.frame_id
+        self.pose.header.stamp = msg.header.stamp
+        self.pose.pose.position = msg.pose.pose.position
+        self.pose.pose.orientation = msg.pose.pose.orientation
 
     def odom_callback(self, msg: Odometry):
         """Fallback: use odometry pose if no localization pose is available."""
-        self.odom_pose.header = msg.header
-        self.odom_pose.pose = msg.pose.pose
+        self.odom_pose.header.frame_id = msg.header.frame_id
+        self.odom_pose.header.stamp = msg.header.stamp
+        self.odom_pose.pose.position = msg.pose.pose.position
+        self.odom_pose.pose.orientation = msg.pose.pose.orientation
 
     def laserscan_to_pointcloud2(self, scan: LaserScan) -> PointCloud2:
         """
@@ -134,9 +136,9 @@ class ScanCaptureNode(Node):
         header.frame_id = scan.header.frame_id
 
         fields = [
-            PointField('x', 0, PointField.FLOAT32, 1),
-            PointField('y', 4, PointField.FLOAT32, 1),
-            PointField('z', 8, PointField.FLOAT32, 1),
+            PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+            PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+            PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
         ]
 
         return pc2.create_cloud(header, fields, points)
