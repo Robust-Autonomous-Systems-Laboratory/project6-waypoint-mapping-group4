@@ -13,12 +13,6 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
-# Generate service interfaces
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "srv/CaptureScan.srv"
-  DEPENDENCIES std_msgs geometry_msgs sensor_msgs
-)
-
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})
 
@@ -26,6 +20,7 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scan_capture_pkg/scan_capture_node.py
   scan_capture_pkg/keyboard_capture.py
+  scan_capture_pkg/extended_kalman.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

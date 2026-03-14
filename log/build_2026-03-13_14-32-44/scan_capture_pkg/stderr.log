@@ -1,0 +1,8 @@
+[31mCMake Error at /opt/ros/jazzy/share/rosidl_cmake/cmake/rosidl_generate_interfaces.cmake:95 (message):
+  rosidl_generate_interfaces() the passed file 'srv/CaptureScan.srv' doesn't
+  exist relative to the CMAKE_CURRENT_SOURCE_DIR
+  '/home/quin/ee5531/proj6_ws/src/project6-waypoint-mapping-group4/scan_capture_pkg'
+Call Stack (most recent call first):
+  CMakeLists.txt:17 (rosidl_generate_interfaces)
+
+[0m

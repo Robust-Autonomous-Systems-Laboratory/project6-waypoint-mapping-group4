@@ -4,7 +4,7 @@
   <name>scan_capture_pkg</name>
   <version>1.0.0</version>
   <description>Waypoint localization with scan capture for TurtleBot3</description>
-  <maintainer email="student@university.edu">Student Team</maintainer>
+  <maintainer email="iqmattso@mtu.edu"> Team 4 - Malcom, Ian</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake_python</buildtool_depend>
@@ -28,6 +28,6 @@
   <test_depend>ament_lint_common</test_depend>
 
   <export>
-    <build_type>ament_cmake_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>

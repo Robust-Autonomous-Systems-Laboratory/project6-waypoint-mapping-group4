@@ -16,7 +16,7 @@ Project: 6 - Waypoint Mapping
 
 import rclpy
 from rclpy.node import Node
-from scan_capture_pkg.srv import CaptureScan
+from capture_service.srv import CaptureScan
 
 import sys
 import termios

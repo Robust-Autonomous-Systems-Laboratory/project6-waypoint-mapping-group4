@@ -1,0 +1,42 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from capture_srv/srv/CaptureScan.srv
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/PoseStamped.idl"
+
+module capture_srv {
+  module srv {
+    @verbatim (language="comment", text=
+      "CaptureScan.srv" "\n"
+      "Service to capture a laser scan at a waypoint")
+    struct CaptureScan_Request {
+      @verbatim (language="comment", text=
+        "Request" "\n"
+        "ID of the current waypoint (1-indexed)")
+      int32 waypoint_id;
+
+      @verbatim (language="comment", text=
+        "Optional description of the waypoint")
+      string description;
+    };
+    @verbatim (language="comment", text=
+      "Response")
+    struct CaptureScan_Response {
+      @verbatim (language="comment", text=
+        "Whether capture was successful")
+      boolean success;
+
+      @verbatim (language="comment", text=
+        "Status message")
+      string message;
+
+      @verbatim (language="comment", text=
+        "Path to saved point cloud file")
+      string filename;
+
+      @verbatim (language="comment", text=
+        "Estimated pose at capture time")
+      geometry_msgs::msg::PoseStamped pose;
+    };
+  };
+};

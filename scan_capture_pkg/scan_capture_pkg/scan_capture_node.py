@@ -21,7 +21,7 @@ from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry
 from datetime import datetime
 
-from scan_capture_pkg.srv import CaptureScan
+from capture_service.srv import CaptureScan
 
 import sensor_msgs_py.point_cloud2 as pc2
 import numpy as np
@@ -47,7 +47,7 @@ class ScanCaptureNode(Node):
         # =====================================================================
         # Parameters
         self.declare_parameter('output_dir', 'data/captures')
-        self.declare_parameter('pose_topic', '/localization/pose') # double check the default topic!!!
+        self.declare_parameter('pose_topic', '/localization_node/ekf/odometry') # consistent with project 4 specs
         self.declare_parameter('scan_topic', '/scan')
 
         self.output_dir = self.get_parameter('output_dir').get_parameter_value().string_value
@@ -56,9 +56,9 @@ class ScanCaptureNode(Node):
 
         # =====================================================================
         # State variables
-        self.pose = PoseStamped
-        self.scan = LaserScan
-        self.odom_pose = PoseStamped # backup if no pose
+        self.pose = PoseStamped()
+        self.scan = LaserScan()
+        self.odom_pose = PoseStamped() # backup if no pose
         self.counter = 0 # number of captures taken
 
         # =====================================================================
@@ -69,9 +69,14 @@ class ScanCaptureNode(Node):
             depth=1
         )
 
-        self.scan_subcription = self.create_subscription(LaserScan, self.scan_topic, self.scan_callback, qos_profile)
-        self.pose_subscription = self.create_subscription(PoseStamped, self.pose_topic, self.pose_callback)
-        self.odom_subscription = self.create_subscription(Odometry, '/odom', self.odom_callback)
+        # laserscan topic /scan
+        self.scan_subcription = self.create_subscription(LaserScan, self.scan_topic, self.scan_callback, qos_profile=qos_profile)
+
+        # localization node (ekf) pose topic - given as odom but converted similar to /odom
+        self.pose_subscription = self.create_subscription(Odometry, self.pose_topic, self.ekf_pose_callback, qos_profile=qos_profile)
+
+        # default fallback pose topic from TB3 /odom
+        self.odom_subscription = self.create_subscription(Odometry, '/odom', self.odom_callback, qos_profile=qos_profile)
 
         # =====================================================================
         # Publishers
@@ -80,8 +85,6 @@ class ScanCaptureNode(Node):
         # =====================================================================
         # Service
         self.srv = self.create_service(CaptureScan, 'capture_scan', self.capture_callback)
-
-
         self.get_logger().info('Scan Capture Node started')
 
 
@@ -92,9 +95,14 @@ class ScanCaptureNode(Node):
         """Store the latest laser scan."""
         self.scan = msg
 
-    def pose_callback(self, msg: PoseStamped):
-        """Store the latest pose estimate."""
-        self.pose = msg
+    # actually an odom msg to capture the odom from the existing kf_node from project 4
+    def ekf_pose_callback(self, msg: Odometry):
+        """Store the latest pose estimate from the localization node."""
+        # self.pose.header = msg.header
+        # self.pose.header.frame_id = "map"
+        # self.pose.header.stamp = node.get_clock().now().to_msg() # FINISH AND REVISE!
+        # self.pose.position.x = 1.0
+        # self.pose.pose.position = msg.pose.pose.position
 
     def odom_callback(self, msg: Odometry):
         """Fallback: use odometry pose if no localization pose is available."""
