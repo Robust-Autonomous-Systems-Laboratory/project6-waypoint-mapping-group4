@@ -1,0 +1,16 @@
+waypoint_id: 1
+timestamp: 2026_03_14-22_59_09
+pose:
+  x: -0.00017029268904553626
+  y: -5.677012924759586e-08
+  yaw: 0.00058336055131673
+description: test
+scan_metadata:
+  frame: base_scan
+  angle_min: 0.018469644710421562
+  angle_max: 6.275902271270752
+  angle_increment: 0.02519342675805092
+  time_increment: 0.000436571630416438
+  scan_time: 0.10843373835086823
+  range_min: 0.0
+  range_max: 100.0

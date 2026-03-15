@@ -3,6 +3,7 @@
 ## Terminal 1
 ```
 $ source ~/ee5531/scripts/turtlebot_connect.sh
+$ cd ~/catkin_ws/src/project6-waypoint-mapping-group4
 $ ros2 launch scan_capture_pkg scan_capture.launch.py
 ```
 
@@ -17,7 +18,7 @@ description: 'test'"
 ## Terminal 3:
 ```
 $ source ~/ee5531/scripts/turtlebot_connect.sh
-$ ros2 run scan_capture_pkg kf_node.py 
+$ ros2 run scan_capture_pkg ekf_node.py 
 ```
 
 ## Terminal 4:

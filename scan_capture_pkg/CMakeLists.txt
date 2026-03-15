@@ -23,7 +23,7 @@ install(PROGRAMS
   scan_capture_pkg/unscented_kalman.py
   scan_capture_pkg/extended_kalman.py
   scan_capture_pkg/kalman.py
-  scan_capture_pkg/kf_node.py
+  scan_capture_pkg/ekf_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

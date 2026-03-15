@@ -48,7 +48,7 @@ class ScanCaptureNode(Node):
         # =====================================================================
         # Parameters
         self.declare_parameter('output_dir', 'data/captures')
-        self.declare_parameter('pose_topic', '/localization_node/ekf/odometry') # consistent with project 4 specs
+        self.declare_parameter('pose_topic', '/localization/pose')
         self.declare_parameter('scan_topic', '/scan')
 
         self.output_dir = self.get_parameter('output_dir').get_parameter_value().string_value
@@ -74,7 +74,7 @@ class ScanCaptureNode(Node):
         self.scan_subcription = self.create_subscription(LaserScan, self.scan_topic, self.scan_callback, qos_profile=qos_profile)
 
         # localization node (ekf) pose topic - given as odom but converted similar to /odom
-        self.pose_subscription = self.create_subscription(Odometry, self.pose_topic, self.ekf_pose_callback, qos_profile=qos_profile)
+        self.pose_subscription = self.create_subscription(PoseStamped, self.pose_topic, self.ekf_pose_callback, qos_profile=qos_profile)
 
         # default fallback pose topic from TB3 /odom
         self.odom_subscription = self.create_subscription(Odometry, '/odom', self.odom_callback, qos_profile=qos_profile)
@@ -96,13 +96,13 @@ class ScanCaptureNode(Node):
         """Store the latest laser scan."""
         self.scan = msg
 
-    # actually an odom msg to capture the odom from the existing kf_node from project 4
-    def ekf_pose_callback(self, msg: Odometry):
+    # ekf updated to publish PoseStamped
+    def ekf_pose_callback(self, msg: PoseStamped):
         """Store the latest pose estimate from the localization node."""
         self.pose.header.frame_id = msg.header.frame_id
         self.pose.header.stamp = msg.header.stamp
-        self.pose.pose.position = msg.pose.pose.position
-        self.pose.pose.orientation = msg.pose.pose.orientation
+        self.pose.pose.position = msg.pose.position
+        self.pose.pose.orientation = msg.pose.orientation
 
     def odom_callback(self, msg: Odometry):
         """Fallback: use odometry pose if no localization pose is available."""
