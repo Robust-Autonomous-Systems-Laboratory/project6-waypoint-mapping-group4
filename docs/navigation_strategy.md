@@ -1,40 +1,25 @@
 # Navigation and Measurement Strategy
 
 ## Team Members
-- Member 1: [Name]
-- Member 2: [Name]
+- Member 1: Malcolm Benedict
+- Member 2: Ian Q. Mattson
 
 ---
 
 ## 1. Environment Description
 
 ### Location
-[Describe the room/area: dimensions, floor type, notable features]
+The room where the experiment will be preformed is EERC 722, the Academic Robotics Lab. This environment presents a unique challenge: the north wall is a good landmark, however on the other three sides, there are tables and chairs which will not return a clean LiDAR reading. Because of this, we have elected to add an additional landmark in the form of a recycle bin placed in the center of the room.
 
 ### Environment Sketch
-```
-[Draw ASCII sketch of environment with walls, landmarks, and planned waypoints]
+![A drawing of EERC 722](../figures/roomSketch.png "Sketch of the room with waypoints")
 
-Example:
-    +------------------+
-    |                  |
-    |   [P]            |  P = Pillar
-    |                  |
-    |  1 ----> 2       |  1-5 = Waypoints
-    |          |       |  Arrows = Path
-    |          v       |
-    |  5 <---- 3 -> 4  |
-    |                  |
-    +------------------+
-         North Wall
-```
 
 ### Identified Landmarks
 | ID | Landmark | Location | Notes |
 |----|----------|----------|-------|
-| A  | North wall | North side | Flat surface, good for distance measurement |
-| B  | Pillar | Center-left | Clear corner visible to LiDAR |
-| C  | ... | ... | ... |
+| A  | North wall | North side | Flat surface, good for distance measurement. |
+| B  | Recycle Bin | Center | Should be clearly visible from all waypoints and has good corners. |
 
 ---
 
@@ -44,16 +29,17 @@ Example:
 
 | Waypoint | Position (x, y) | Landmark to Measure | Measurement Direction |
 |----------|-----------------|---------------------|----------------------|
-| 1 (Start)| (0.0, 0.0) | North wall | Straight ahead (0°) |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
+| 1 (Start)| (0.0, 0.0) | North wall | South |
+| 2 | (0.0, 0.0) | Recycle Bin | South |
+| 3 | (0.0, 0.0) | Recycle Bin | East |
+| 4 | (0.0, 0.0)| Recycle Bin | North |
+| 5 | (0.0, 0.0) | North wall | North |
+| 6 (Loop Closure)| (0.0, 0.0)| North wall | South |
 
 ### Path Statistics
-- Number of waypoints: 
+- Number of waypoints: 6
 - Total path length: 
-- Loop closure planned: Yes / No
+- Loop closure planned: Yes 
 - Estimated navigation time: 
 
 ---
@@ -61,23 +47,24 @@ Example:
 ## 3. Orientation Strategy
 
 ### Heading Reference System
-[Describe how you will define and track orientation]
+Orientation will be defined in cardinal directions, using the north wall as a reference. For the sake of convenience, tape markings will be added to the floor. Angle measurements will be taken 
+at the point alone the surface closest to the robot. (The ray from the robot to the surface should be normal to the surface.)
 
 Options:
 - [ ] Align robot parallel to a specific wall at each waypoint
 - [ ] Use floor tape lines to define heading
-- [ ] Use compass directions (if walls align N/S/E/W)
+- [x] Use compass directions (if walls align N/S/E/W)
 - [ ] Other: _______________
 
 ### At Each Waypoint
 | Waypoint | Orientation Reference | Expected Landmark Direction |
 |----------|----------------------|----------------------------|
-| 1 | Parallel to south wall | North wall at 0° (ahead) |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
-
+| 1 | North Wall | North wall at 180° (Behind) |
+| 2 | West side of trash can | Trash can at 90° (Left) |
+| 3 | South side of trash can | Trash can at 90° (Left) |
+| 4 | East side of trash can | Trash can at 90° (Left) |
+| 5 | North Wall | North wall at 0° (Aead) |
+| 6 | North Wall | North wall at 180° (Behind) |
 ---
 
 ## 4. Measurement Protocol
@@ -99,29 +86,29 @@ Options:
 7. [ ] Note any observations
 
 ### Measurement Technique
-- Measuring from: [LiDAR center / robot center / tape mark]
-- Measuring to: [Wall surface / corner point / pillar edge]
-- Tool: [Tape measure / laser measure]
-- Estimated measurement uncertainty: ± ___ m
+- Measuring from: Tape mark
+- Measuring to: Wall surface
+- Tool: Laser measure
+- Estimated measurement uncertainty: ± 10 mm
 
 ---
 
 ## 5. Expected Challenges
 
 ### Localization Error Sources
-1. **Odometry drift**: [Expected impact, mitigation]
-2. **IMU bias**: [Expected impact, mitigation]
-3. **Wheel slip**: [Floor conditions]
+1. **Odometry drift**: Significant impact expected. Unfortunately very little can be done about this besides minimizing the number of turns.
+2. **IMU bias**: Moderate impact expected. While IMU data is typically not great, it is not the only data being used and the EKF should help mitigate the impact.
+3. **Wheel slip**: Minimal. The floor appears relatively clean. Picking up obvious debris and minimizing turns should further mitigate this.
 
 ### Mapping Challenges
-1. **Scan alignment**: [How might scans misalign?]
-2. **Landmark visibility**: [Any occlusion concerns?]
-3. **Environmental factors**: [People, lighting, reflections]
+1. **Scan alignment**: This is a significant issue. Due to human error it is very likely the scans will not align perfectly.
+2. **Landmark visibility**: Should be pretty good, the robot is always relatively close to the landmarks.
+3. **Environmental factors**: The biggest issues here will be people and inconsistent readings from table legs.
 
 ### Mitigation Strategies
-- 
-- 
-- 
+- Minimize unnecessary turning.
+- Take extra care when recording measurements and piloting the robot.
+- Use the EKF to filter IMU data.
 
 ---
 

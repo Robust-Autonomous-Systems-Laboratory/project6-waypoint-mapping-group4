@@ -32,59 +32,70 @@ waypoints:
       x_m: 0.0
       y_m: 0.0
     
-    # Robot orientation: describe what direction the robot is facing
+    # Robot orientation: South
     # Example: "Facing north wall", "Aligned with doorway", "Parallel to east wall"
     orientation_reference: "Initial heading (define as 0°)"
     
     # Landmark measurement: measure distance to a visible feature
     landmark:
-      description: "North wall, directly ahead"  # What is the landmark?
-      measured_distance_m: 0.0    # Distance from robot to landmark (tape measure)
-      direction: "0° (straight ahead)"  # Where is it relative to robot heading?
+      description: "North wall, directly behind"  # What is the landmark?
+      measured_distance_m: 1.37    # Distance from robot to landmark (tape measure)
+      direction: "180° (straight behind)"  # Where is it relative to robot heading?
       
   - id: 2
     description: ""
     position:
-      x_m: 0.0    # Measure from start position
-      y_m: 0.0
-    orientation_reference: ""
+      x_m: 0.93    
+      y_m: 1.845
+    orientation_reference: "0°"
     landmark:
-      description: ""
-      measured_distance_m: 0.0
-      direction: ""
+      description: "Recycle bin, due left"
+      measured_distance_m: 1.598
+      direction: "90°"
       
   - id: 3
     description: ""
     position:
-      x_m: 0.0
-      y_m: 0.0
-    orientation_reference: ""
+      x_m: -0.813
+      y_m: 3.5
+    orientation_reference: "90°"
     landmark:
-      description: ""
-      measured_distance_m: 0.0
-      direction: ""
+      description: "Recycle bin, due left"
+      measured_distance_m: 1.4439
+      direction: "90°"
       
   - id: 4
     description: ""
     position:
-      x_m: 0.0
-      y_m: 0.0
-    orientation_reference: ""
+      x_m: -1.947
+      y_m: 1.81
+    orientation_reference: "180°"
     landmark:
-      description: ""
-      measured_distance_m: 0.0
-      direction: ""
+      description: "Recycle bin, due left"
+      measured_distance_m: 1.963
+      direction: "90°"
       
   - id: 5
     description: ""
     position:
+      x_m: -1.938
+      y_m: 0.001
+    orientation_reference: "270°"
+    landmark:
+      description: "North wall, directly right"
+      measured_distance_m: 1.373
+      direction: "270°"
+
+  - id: 6
+    description: "Loop close"
+    position:
       x_m: 0.0
       y_m: 0.0
-    orientation_reference: ""
+    orientation_reference: "0°"
     landmark:
-      description: ""
-      measured_distance_m: 0.0
-      direction: ""
+      description: "North wall, directly behind"
+      measured_distance_m: 1.37
+      direction: "180° (straight behind)"
 
 # Summary of map accuracy (fill in after analysis)
 map_evaluation:
