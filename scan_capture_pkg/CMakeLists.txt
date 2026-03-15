@@ -22,6 +22,7 @@ install(PROGRAMS
   scan_capture_pkg/keyboard_capture.py
   scan_capture_pkg/extended_kalman.py
   scan_capture_pkg/ekf_node.py
+  scan_capture_pkg/transformer.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
