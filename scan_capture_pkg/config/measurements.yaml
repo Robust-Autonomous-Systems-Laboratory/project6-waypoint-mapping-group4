@@ -39,13 +39,13 @@ waypoints:
     # Landmark measurement: measure distance to a visible feature
     landmark:
       description: "North wall, directly behind"  # What is the landmark?
-      measured_distance_m: 1.37    # Distance from robot to landmark (tape measure)
+      measured_distance_m: 1.370    # Distance from robot to landmark (tape measure)
       direction: "180° (straight behind)"  # Where is it relative to robot heading?
       
   - id: 2
     description: ""
     position:
-      x_m: 0.93    
+      x_m: 0.930    
       y_m: 1.845
     orientation_reference: "0°"
     landmark:
@@ -57,22 +57,22 @@ waypoints:
     description: ""
     position:
       x_m: -0.813
-      y_m: 3.5
+      y_m: 3.500
     orientation_reference: "90°"
     landmark:
       description: "Recycle bin, due left"
-      measured_distance_m: 1.4439
+      measured_distance_m: 1.444
       direction: "90°"
       
   - id: 4
     description: ""
     position:
       x_m: -1.947
-      y_m: 1.81
+      y_m: 1.810
     orientation_reference: "180°"
     landmark:
       description: "Recycle bin, due left"
-      measured_distance_m: 1.963
+      measured_distance_m: 0.963
       direction: "90°"
       
   - id: 5
@@ -89,34 +89,80 @@ waypoints:
   - id: 6
     description: "Loop close"
     position:
-      x_m: 0.0
-      y_m: 0.0
+      x_m: 0.000
+      y_m: 0.000
     orientation_reference: "0°"
     landmark:
       description: "North wall, directly behind"
-      measured_distance_m: 1.37
+      measured_distance_m: 1.370
       direction: "180° (straight behind)"
 
 # Summary of map accuracy (fill in after analysis)
 map_evaluation:
-  # For each waypoint, record the RViz-measured distance and compute error
-  # Example:
-  # - waypoint: 1
-  #   landmark: "North wall"
-  #   measured_m: 2.35
-  #   rviz_m: 2.31
-  #   error_m: 0.04
-  #   error_percent: 1.7
-  results: []
+    - waypoint: 1
+      landmark:
+        description: "North wall, directly behind"
+        measured_distance_m: 1.370
+        direction: "180°"
+        rviz_m: 1.368
+        error_m: 0.002
+        error_percent: 0.146
+
+    - waypoint: 2
+      landmark:
+        description: "Recycle bin, due left"
+        measured_distance_m: 1.598
+        direction: "90°"
+        rviz_m: 1.605
+        error_m: 0.007
+        error_percent: 0.438
+
+    - waypoint: 3
+      landmark:
+        description: "Recycle bin, due left"
+        measured_distance_m: 1.444
+        direction: "90°"
+        rviz_m: 1.454
+        error_m: 0.010
+        error_percent: 0.693
+
+    - waypoint: 4
+      landmark:
+        description: "Recycle bin, due left"
+        measured_distance_m: 0.963
+        direction: "90°"
+        rviz_m: 0.940
+        error_m: 0.023
+        error_percent: 2.388
+
+    - waypoint: 5
+      landmark:
+        description: "North Wall, directly right"
+        measured_distance_m: 1.373
+        direction: "270°"
+        rviz_m: 1.396
+        error_m: 0.023
+        error_percent: 1.675
+
+    - waypoint: 6
+      landmark:
+        description: "North Wall, directly behind"
+        measured_distance_m: 1.370
+        direction: "180°"
+        rviz_m: 1.378
+        error_m: 0.008
+        error_percent: 0.584
+
+results: [0.002, 0.007, 0.010, 0.023, 0.023, 0.008] 
   
   # Overall assessment
-  mean_distance_error_m: 0.0
-  max_distance_error_m: 0.0
-  notes: ""
+  mean_distance_error_m: 0.012
+  max_distance_error_m: 0.023
+  notes: "Overall very good, despite the accumulated error in the map"
 
 # Metadata
 metadata:
-  date: "YYYY-MM-DD"
-  team_members: []
-  environment: ""
+  date: "2026-03-15"
+  team_members: [Malcolm Benedict, Ian Q. Mattson]
+  environment: "EERC 722"
   measurement_tool: "Tape measure"

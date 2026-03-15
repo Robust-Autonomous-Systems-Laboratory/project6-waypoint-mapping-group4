@@ -26,31 +26,87 @@ Our navigation strategy is to use the north wall and the recycle bin in the cent
 ## 3. Map Accuracy Results
 <div align="center">
 
-#### Distance accuracy table 
+#### Composite Map From All Waypoints
+![Rviz map](figures/rviz_screenshots/allWaypoints.png "Composite map of all waypoints")
+
+#### Distance Accuracy Table 
 
 | Waypoint | Landmark | Measured (m) | RViz (m) | Error (m) | Error (%) |
 |----------|----------|--------------|----------|-----------|-----------|
-| 1 | North wall | 1.37 | - | - | -% |
-| 2 | Recycle bin | 1.598 | - | - | -% |
-| 3 | Recycle bin | 1.4439 | - | - | -% |
-| 4 | Recycle bin | 1.963 | - | - | -% |
-| 5 | North wall | 1.373 | - | - | -% |
-| 6 | North wall | 1.37 | - | - | -% |
-
+| 1 | North wall | 1.370 | 1.368 | 0.002 | 0.146% |
+| 2 | Recycle bin | 1.598 | 1.605 | 0.007 | 0.438% |
+| 3 | Recycle bin | 1.444 | 1.454 | 0.010 | 0.693% |
+| 4 | Recycle bin | 0.963 | 0.940 | 0.023 | 2.388% |
+| 5 | North wall | 1.373 | 1.396 | 0.023 | 1.675% |
+| 6 | North wall | 1.370 | 1.378 | 0.008 | 0.584% |
 </div>
 
+Overall, the distance measurements are remarkably good, with an average error of just 12mm and a max error of 23mm. However, as the Composite Map shows, there is significant drift in the later points in terms of orientation. This is because the pose is calculated from Kalman filtered IMU and `/cmd_vel` data. While the filter helps mitigate noise, error still accumulates, particularly in the orientation. The pilot aligned the robot to the prerecorded position, so the distance measurement error remains small. However, the TF used to localize the point clouds into the global frame was derived from the pose data, causing the to become misaligned over time.
 
-- Orientation assessment for each waypoint
-- RViz screenshots showing:
-  - Individual scan captures at each waypoint
-  - Measurement tool usage
-  - Overall map with all scans visualized
+<div align="center">
+
+#### Measurement Example
+![Rviz map](figures/rviz_screenshots/measuringExample.png "Example of the Rviz Measurement tool")
+</div>
+The ground truth measurements were preformed with a laser rangefinder, accurate to 1mm. The point clouds were recorded from the TurtleBot's LiDAR, and the distances were measured with the Rviz measurement tool, as seen above.
+
+<div align="center">
+
+#### Waypoint One Point Cloud
+![Rviz map](figures/rviz_screenshots/waypoint1_rviz.png "Point cloud")
+</div>
+
+The initial reading is quite good. The wall is a very good landmark and there is no accumulated localization error. The above figure shows the Rviz view as the data was being recorded.
+
+<div align="center">
+
+#### Waypoint Two Point Cloud
+![Rviz map](figures/rviz_screenshots/waypoint2_rviz.png "Point cloud")
+</div>
+
+Much like Waypoint One, this Waypoint is still quite well localized in the composite map.
+
+<div align="center">
+
+#### Waypoint Three Point Cloud
+![Rviz map](figures/rviz_screenshots/waypoint3_rviz.png "Point cloud")
+</div>
+
+Much like Waypoint One and Two, this Waypoint is still quite well localized in the composite map.
+
+
+<div align="center">
+
+#### Waypoint Four Point Cloud
+![Rviz map](figures/rviz_screenshots/waypoint4_rviz.png "Point cloud")
+</div>
+
+Here the localization begins to break down, likely as a result of wheel slip during one of the turns. The North Wall has become clearly misaligned and there is significant ghosting.
+
+<div align="center">
+
+#### Waypoint Five Point Cloud
+![Rviz map](figures/rviz_screenshots/waypoint5_rviz.png "Point cloud")
+</div>
+
+The localization error from Waypoint Four is still present. Given that this map is fairly well aligned with that of Waypoints Four and Six, it seems likely that a large portion of the error came from some single source between Three and Four, possibly wheel slip.
+
+<div align="center">
+
+#### Waypoint Six Point Cloud
+![Rviz map](figures/rviz_screenshots/waypoint6_rviz.png "Point cloud")
+</div>
+
+From the loop closure point it is clear that a noticeable localization error has accumulated.
 
 ## 4. Discussion
-- Analysis of mapping accuracy
-- Sources of error (localization, measurement, sensor)
-- Map consistency assessment
-- Recommendations for improvement
+
+Overall, each point cloud is remarkably accurate, that is to say that the distance readings to known landmarks are close to the ground truth. There is no bias that is visible via causal inspection. The primary source of error with regards to the LiDAR is more likely misalignment with floor markings during trials or initial mismeasurement.
+
+However this does not necessarily mean that the resulting map is good. Due to poor localization, the point clouds captured later in the run are quite misaligned. This is a result of relying on IMU, encoder and command data to dead reckon the position. While there are multiple sources of data, and said data are filtered via Extended Kalman FIlter, there is still no sort of feedback to close the loop. As a result, error, particularly rotational error, tends to accumulate. 
+
+Thus, the map is consistent, but poorly localized. Each measurement is good, the error is mostly coming from the combination. The main way to fix this would be to provide some sort of loop closure with a sensor that could measure orientation or even position directly. This would reduce the impact of the error accumulation. While a sensor such as a compass could theoretically fill this role, adding additional sensors is not actually needed. The LiDAR itself can be used help localize, while mapping. The obvious solution for improvement is to use SLAM, which should help limit some of the localization error, although it is difficult to remove entirely.
+
 
 ## 5. Usage Instructions
 
