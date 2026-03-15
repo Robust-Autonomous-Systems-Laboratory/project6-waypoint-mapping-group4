@@ -9,14 +9,14 @@ Controls:
     s:   Capture scan with auto-incrementing ID
     q:   Quit
 
-Author: [Student Team]
+Author: Malcolm, Ian (Group 4)
 Course: EE5531 Introduction to Robotics
 Project: 6 - Waypoint Mapping
 """
 
 import rclpy
 from rclpy.node import Node
-from scan_capture_pkg.srv import CaptureScan
+from capture_service.srv import CaptureScan
 
 import sys
 import termios
@@ -33,10 +33,10 @@ class KeyboardCaptureNode(Node):
         super().__init__('keyboard_capture')
         
         # Service client
-        self.client = self.create_client(CaptureScan, '/scan_capture/capture')
+        self.client = self.create_client(CaptureScan, '/capture_scan') 
         
         # Wait for service
-        self.get_logger().info('Waiting for /scan_capture/capture service...')
+        self.get_logger().info('Waiting for /capture_scan service...')
         while not self.client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Service not available, waiting...')
         

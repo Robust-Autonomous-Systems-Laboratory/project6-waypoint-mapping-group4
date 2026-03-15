@@ -1,0 +1,11 @@
+{
+  "package_name": "capture_srv",
+  "output_dir": "/home/quin/ee5531/proj6_ws/src/project6-waypoint-mapping-group4/build/capture_srv/rosidl_generator_type_description/capture_srv",
+  "idl_tuples": [
+    "/home/quin/ee5531/proj6_ws/src/project6-waypoint-mapping-group4/build/capture_srv/rosidl_adapter/capture_srv:srv/CaptureScan.idl"
+  ],
+  "include_paths": [
+    "service_msgs:/opt/ros/jazzy/share/service_msgs",
+    "builtin_interfaces:/opt/ros/jazzy/share/builtin_interfaces"
+  ]
+}

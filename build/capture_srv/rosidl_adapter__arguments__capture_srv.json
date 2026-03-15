@@ -1,0 +1,6 @@
+{
+  "package_name": "capture_srv",
+  "non_idl_tuples": [
+    "/home/quin/ee5531/proj6_ws/src/project6-waypoint-mapping-group4/capture_srv:srv/CaptureScan.srv"
+  ]
+}
