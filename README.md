@@ -20,7 +20,7 @@ Our navigation strategy is to use the north wall and the recycle bin in the cent
 
 #### Turtlebot Navigating Between the Waypoints
 ![Physical waypoints in EERC 722](figures/project_6_waypoints.jpeg "Navigational waypoints in the lab")
-*The Turtlebot navigating between waypoints with indicated orientation, and the referenced recycle bin in the center of the waypoints*
+*The Turtlebot navigating from Waypoint 1 to Waypoint 2 with indicated orientation, and the referenced recycle bin in the center of the waypoints.*
 </div>
 
 ## 2. System Architecture
