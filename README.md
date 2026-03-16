@@ -16,6 +16,12 @@ Mapping is a key part of mobile robotics, and this exercise served as an introdu
 
 Our navigation strategy is to use the north wall and the recycle bin in the center of the room as landmarks. For points 1,5, and 6, the robot uses the wall as its landmark. For points 2,3, and 5, it uses the recycle bin. At every waypoint the robot's orientation is one of the four cardinal directions (N,W,S,E), with 0° corresponding to south. While only five points are required, a sixth point was added, which is identical to the first one, for loop closure purposes. A detailed discussing of the strategy can be found in the [`navigation_strategy.md`](./docs/navigation_strategy.md) document.
 
+<div style="text-align: center;">
+
+#### Turtlebot Navigating Between the Waypoints
+![Physical waypoints in EERC 722](figures/project_6_waypoints.jpeg "Navigational waypoints in the lab")
+*The Turtlebot navigating between waypoints with indicated orientation, and the referenced recycle bin in the center of the waypoints*
+</div>
 
 ## 2. System Architecture
 <div align="center">
@@ -48,6 +54,21 @@ This project incorporated an Extended Kalman Filter from project 4. The paramete
         [0, 0, 0, 1/delta_t, 0],
         [0, 0, 0, 0, 1]]
 ``` 
+Noise covariance matrices for this implementation are represented as Q for process noise covariance and R for measurement noise covariance, estimated as follows:
+
+```
+       [[0.01, 0, 0, 0, 0],
+  Q =   [0, 0.01, 0, 0, 0],
+        [0, 0, 0.01, 0, 0],
+        [0, 0, 0, 0.1,  0],
+        [0, 0, 0, 0,  0.1]]
+
+       [[0.2, 0, 0, 0],
+  R =   [0, 0.2, 0, 0],
+        [0, 0, 0.3, 0],
+        [0, 0, 0, 0.3]]
+```
+
 
 The EKF used to filter the IMU and encoder data can take the variable covariance as a parameter matrix. If the IMU and encoders have been properly characterized, this data can be provided. Known LiDAR bias can be accounted for by simple subtraction and scaling. However, as discussed later, the intrinsic parameters of the LiDAR are likely a negligible source of error within the scope of this experiment.
 
