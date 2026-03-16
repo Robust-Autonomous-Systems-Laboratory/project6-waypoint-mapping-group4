@@ -1,7 +1,6 @@
 # Project 6: Naive Mapping by Waypoints
 
-## Ian Q. Mattson & Malcolm Benedict
----
+#### Ian Q. Mattson & Malcolm Benedict
 
 ## Introduction
 
@@ -19,9 +18,38 @@ Our navigation strategy is to use the north wall and the recycle bin in the cent
 
 
 ## 2. System Architecture
-- Data flow diagram
-- Your EKF/UKF configuration summary
-- How you would incorporate Project 5 sensor characterization into the mapping pipeline
+<div align="center">
+
+#### Flow Graph
+![Block Diagram](figures/diagram.png "Block Diagram of the System")
+</div>
+
+This project incorporated an Extended Kalman Filter from project 4. The parameters used are as follows:
+
+
+```
+       [[1, 0, -v*sin(ekf_x[2, 0])*delta_t, cos(ekf_x[2, 0])*delta_t, 0],
+        [0, 1,  v*cos(ekf_x[2, 0])*delta_t, sin(ekf_x[2, 0])*delta_t, 0],
+  F =   [0, 0, 1, 0, delta_t],
+        [0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 1]]
+```        
+
+```
+       [[v_left],
+  z =   [v_right],
+        [imu_a],
+        [imu_omega]]
+ ```
+
+```
+       [[0, 0, 0, 1, -L/2],
+  H =   [0, 0, 0, 1, L/2],
+        [0, 0, 0, 1/delta_t, 0],
+        [0, 0, 0, 0, 1]]
+``` 
+
+The EKF used to filter the IMU and encoder data can take the variable covariance as a parameter matrix. If the IMU and encoders have been properly characterized, this data can be provided. Known LiDAR bias can be accounted for by simple subtraction and scaling. However, as discussed later, the intrinsic parameters of the LiDAR are likely a negligible source of error within the scope of this experiment.
 
 ## 3. Map Accuracy Results
 <div align="center">
