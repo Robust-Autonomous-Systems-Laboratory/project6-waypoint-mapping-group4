@@ -175,4 +175,31 @@ $ ros2 run scan_capture_pkg keyboard_capture.py
 and enter the corresponding waypoint ID to save artifacts at each point.  Press `q` to quit the node.
 
 ### How to visualize the captured map
-WIP
+
+To visualize the captured map, first open three terminal windows and, in each one, navigate to the root of the workspace and source.
+
+```
+$ cd ~/project_ws/
+$ source install/setup.bash
+```
+#### Terminal 1 - Rviz2
+
+Rviz is used to actually visualize the data. Open it with
+
+```
+$ rviz2
+```
+Within Rviz, set the fixed frame to `base_scan` (This will be changed shortly) Add the following topics to display: `/scan_capture/pointcloud/PointCloud2` and `/localization/pose/Pose`. This will display the robot's pose and the point cloud together. 
+
+#### Terminal 2 - Localizer Node
+Unfortunately, automatic frame conversion does not seem to to work for the point cloud. To address this, `localizer.py` implements a very simple transform based on the pose. Run it with the following:
+```
+$ ros2 run scan_capture_pkg transformer.py 
+```
+#### Terminal 3 - ROS Bag Playback
+Lastly, play the ROS bag with the following command:
+```
+$ ros2 bag play data/mapping_run --clock
+```
+
+Once the first point cloud appears in Rviz, pause the playback in Terminal 3 with the space bar. In Rviz, change the fixed frame from `base_scan` to `odom`. Resume playback by pressing space in Terminal 3. This step is needed because the first point cloud was generated before any Pose data was. The transformer needs pose data to generate a TF, and the point cloud cannot be plotted in `odom` without a TF.
